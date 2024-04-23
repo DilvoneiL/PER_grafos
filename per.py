@@ -1,5 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+import math
 
 def ler_grafo_arquivo(nome_arquivo):
     grafo = nx.DiGraph()
@@ -24,6 +25,20 @@ def identificar_caminho_critico(grafo, es, ts):
     caminho_critico = [n for n in grafo.nodes if es[n] == ts[n]]
     return caminho_critico
 
+def desenhar_grafo(grafo, caminho_critico, nome_arquivo_saida):
+    num_nodes = len(grafo.nodes())
+    cols = int(math.sqrt(num_nodes))
+    rows = math.ceil(num_nodes / cols)
+    
+    # Posicionando os nós em uma grade que se aproxima de um retângulo
+    pos = {node: (node % cols, -node // cols) for node in grafo.nodes()}
+    
+    nx.draw(grafo, pos, with_labels=True, node_color='lightblue', edge_color='gray')
+    # Desenhando arestas do caminho crítico em vermelho e mais grossas
+    nx.draw_networkx_edges(grafo, pos, edgelist=[(u, v) for u, v in grafo.edges() if u in caminho_critico and v in caminho_critico], edge_color='red', width=2)
+    plt.savefig(nome_arquivo_saida)
+    plt.show()
+
 def main():
     nome_arquivo = 'grafo.txt'
     grafo = ler_grafo_arquivo(nome_arquivo)
@@ -38,6 +53,7 @@ def main():
     print(caminho_critico)
 
     nome_arquivo_saida = 'grafo_com_informacoes.png'
+    desenhar_grafo(grafo, caminho_critico, nome_arquivo_saida)
 
 if __name__ == "__main__":
     main()
